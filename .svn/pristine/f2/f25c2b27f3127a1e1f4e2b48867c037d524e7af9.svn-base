@@ -1,0 +1,20 @@
+package com.dambeetech.first.board.model.service;
+
+import java.util.ArrayList;
+
+import com.dambeetech.first.board.model.vo.Board;
+import com.dambeetech.first.common.CommonPage;
+
+public interface BoardService {
+
+	ArrayList<Board> boardList(CommonPage cpage);
+
+	int boardListCount(CommonPage cpage);
+
+	int boardWrite(Board board);
+
+	Board boardDetail(int boardno);
+
+	
+
+}

@@ -1,0 +1,208 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>   
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<%@ include file="../common/jscsspath.jsp" %>  
+<style type="text/css">
+.page-header{
+	place-content: center;
+}
+.detail1{
+	width:100%;
+}
+.card-title
+{
+    width: 100%;
+    text-align: center;
+}
+#ofile{
+	color: cornflowerblue;
+}
+.boardLabel{
+	height: 25px;
+    padding-top: 7px;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 110px;
+}
+</style>
+<script type="text/javascript">
+$(function(){
+	viewDetailDataGet();
+	
+	//답글 기본 숨김
+	$("#showhide").hide(); // display 속성을 none 으로 바꾼다. 
+	
+	//답글 클릭시
+	/* $('#boardList').click(
+	boardList		
+	); */
+});
+function boardList_click(){
+	location.href="boardList.do?";
+}
+function delete_click(){
+	if(confirm("삭제하시겠습니까??") == true){
+		location.href="boardDelete.do?BOARDNO="+${no };
+	}else{
+		return;
+	}
+}
+function update_click(){
+	if(confirm("수정하시겠습니까??") == true){
+		location.href="boardChangeView.do?BOARDNO="+${no };
+	}else{
+		return;
+	}
+}
+function comment_click(){
+	$("#showhide").toggle();
+}
+function commentdel_click(COMMENTNO){
+	if(confirm("답글을 삭제하시겠습니까??") == true){
+	location.href="boardCommentDel.do?COMMENTNO="+COMMENTNO+"&BOARDNO="+${no };
+	}else{
+		return;
+	}
+}
+
+function commentchang_click(COMMENTNO){
+	var comment = '';
+	
+	comment += "<input type='text' class='form-control' style='width:850px; display:inline;' id='COMMENTCONTENT"+COMMENTNO+"'>";
+	comment += "<button class='btn btn-primary btn-space' style='margin-bottom: 2px;' onclick='commentchange_click("+COMMENTNO+")'>확인</button>";
+	$("#"+COMMENTNO).html(comment);
+}
+function commentchange_click(COMMENTNO){
+	var commentcontent = $("#COMMENTCONTENT"+COMMENTNO).val();
+	if(confirm("답글을 수정하시겠습니까??") == true){
+		location.href="boardCommentChange.do?COMMENTNO="+COMMENTNO+"&BOARDNO="+${no }+"&COMMENTCONTENT="+commentcontent+"";
+		}else{
+			return;
+		}
+}
+
+/* var rootUrl = '${request.context}';  */
+function viewDetailDataGet(){
+		$.ajax({
+			url : "boardDetail.do",
+			data : {no : $("#no").val()},
+			type : "get",
+			contentType : "application/json",
+			success : function(data){
+				console.log(data);
+				var value1 = "<a href='boardfiledown.do?BOARDORIGINALFILE="+data.boardoriginalfile+"&BOARDRENAMEFILE="+data.boardrenamefile+"'>"+data.boardoriginalfile+"</a>";
+				$("#title").html(data.boardtitle);
+				$("#username").val(data.username);
+				$("#content").val(data.username);
+				$("#ofile").html(value1);
+			},
+			error : function(e) {
+                console.log(e.responseText);
+            }
+		}); 
+}
+function commentAdd_click(){
+	if(confirm("답글을 등록 하시겠습니까??") == true){
+		$("form").submit();
+	}else{
+		return;
+	}
+}
+</script>  
+</head>
+<body>
+ <div class="page">
+<jsp:include page="../common/header.jsp" />
+ <div class="page-main">
+        <div class="my-3 my-md-5">
+          <div class="container">
+            <div class="page-header">
+              <h1 class="page-title">
+           	  상세보기
+              </h1>
+            </div>
+        <div class="row">
+              <div class="detail1">
+                <div class="card">
+                  <div class="card-header">
+                  <input type="hidden" id="no" value="${no }">
+                    <h3 class="card-title" id="title"></h3>
+                  </div>
+                  <div class="card-body">
+                      <div class="form-group">
+                        <div class="row align-items-center">
+                          <label class="col-sm-2">글쓴이:</label>
+                          <div class="col-sm-10">
+                            <input type="text" class="form-control" id="username" style="background-color:#fff;" readonly>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row align-items-center">
+                          <label class="col-sm-2">파일:</label>
+                          <div class="col-sm-10">
+                            <h4 id="ofile">
+                            </h4>
+                          </div>
+                        </div>
+                      </div>
+                      <textarea rows="10" class="form-control" id="content" style="background-color:#fff;" readonly></textarea>
+                      <div class="btn-list mt-4 text-right">
+                        <button class="btn btn-primary btn-space" onclick="update_click();">수정</button>
+                        <button class="btn btn-secondary btn-space" onclick="delete_click();">삭제</button>
+                          <button class="btn btn-primary btn-space" onclick="comment_click();">답글</button>
+                     <button class="btn btn-secondary btn-space" id="boarList" onclick="boardList_click();">목록 </button>
+                      </div>
+                  </div>
+                </div>
+                 <form action="commentAdd.do" method="post">
+                 <div class="card" id="showhide">
+                       <div class="card-body" style="padding: 0.5rem;">
+           <div class="form-group">
+                        <div class="row align-items-center">
+                          <label class="boardLabel">답글 :</label>
+                          <div class="col-sm-10" style="padding-top: 3px;">
+							<input type="text" class="form-control" style="background-color:#dee2e6;" id="COMMENTCONTENT" name="COMMENTCONTENT">
+                          </div>
+                           <button class="btn btn-primary btn-space" onclick="commentAdd_click();">작성</button>
+                            <input type="hidden" value="${no }" id="BOARDNO" name="BOARDNO">
+                          <input type="hidden" value="${sessionScope.user.USERNAME }" id="COMMENTNAME" name="COMMENTNAME">
+                      	  <input type="hidden" value="${sessionScope.user.USERNO }" id="USERNO" name="USERNO">
+                        </div>
+                      </div>
+                      </div>
+                 </div>
+                 </form>
+                 <c:if test="${not empty list }">
+                 <div class="card" style="background-color:#dee2e6;">
+                                  <c:forEach items="${ list }" var="a">
+              <div class="card-body" style="padding: 0.5rem;">
+           <div class="form-group">
+                        <div class="row align-items-center">
+                          <label class="boardLabel">${a.COMMENTNAME} :</label>
+                          <div class="" style="padding-top: 3px; width: 950px;" id="${a.COMMENTNO}">
+								${a.COMMENTCONTENT}
+                          </div>
+                              <button class="btn btn-primary btn-space" onclick="commentchang_click(${a.COMMENTNO})">수정</button>
+                              &nbsp;  &nbsp;
+                        	<button class="btn btn-secondary btn-space" onclick="commentdel_click(${a.COMMENTNO});">삭제</button>
+                        </div>
+                      </div>
+                      </div>
+                </c:forEach>
+                </div>
+                </c:if>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+<jsp:include page="../common/footer.jsp" />
+</div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+package com.dambeetech.first.board.model.service;
+
+import java.util.ArrayList;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.dambeetech.first.board.model.dao.BoardDao;
+import com.dambeetech.first.board.model.vo.Board;
+import com.dambeetech.first.common.CommonPage;
+
+@Service("boardService")
+public class BoardServiceImpl implements BoardService{
+
+	@Autowired
+	private BoardDao boardDao;
+	
+	@Override
+	public 	ArrayList<Board> boardList(CommonPage cpage){
+		return boardDao.boardList(cpage);
+	}
+	@Override
+	public int boardListCount(CommonPage cpage) {
+
+		return boardDao.boardListCount(cpage);
+	}
+	@Override
+	public int boardWrite(Board board) {
+		
+		return boardDao.boardWrite(board);
+	}
+	@Override
+	public Board boardDetail(int boardno) {
+		return boardDao.boardDetail(boardno);
+	}
+	
+
+}

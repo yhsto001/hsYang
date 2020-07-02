@@ -1,0 +1,45 @@
+package com.dambeetech.first.board.model.dao;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.dambeetech.first.board.model.vo.Board;
+import com.dambeetech.first.common.CommonPage;
+
+@Repository("boardDao")
+public class BoardDao {
+
+	
+	@Autowired
+	private SqlSessionTemplate sqlSession;
+	
+	
+	public ArrayList<Board> boardList(CommonPage cpage){
+		List<Board> list = sqlSession.selectList("boardMapper.boardList",cpage);
+		return (ArrayList<Board>) list;
+	}
+
+
+	public int boardListCount(CommonPage cpage) {
+		return sqlSession.selectOne("boardMapper.boardListCount",cpage);
+	}
+
+
+	public int boardWrite(Board board) {
+		
+		return sqlSession.insert("boardMapper.boardWrite",board);
+	}
+
+
+	public Board boardDetail(int boardno) {
+		
+		return sqlSession.selectOne("boardMapper.boardDetail",boardno);
+	}
+
+
+
+}

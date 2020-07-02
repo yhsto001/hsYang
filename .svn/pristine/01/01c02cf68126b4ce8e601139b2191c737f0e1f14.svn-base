@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+      PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+ 	<!--MyBatis 뿐만 아니라 iBatis에서도 따옴표를 감싸지 않고 값을 Direct하게 받는 syntax는 ${속성명} 이다. -->
+ 	<!-- WHERE BOARDTITLE LIKE CONCAT('%', #{searchtext}, '%') 이렇게해줘야함 -->
+ 
+  <mapper namespace="boardMapper">
+      
+    <select id="boardList" resultType="Board" parameterType="CommonPage">
+    	SELECT * 
+    	FROM (
+    			SELECT @ROWNUM:=@ROWNUM+1 AS RNUM, 
+    			       BOARDNO, 
+    			       USERNO, 
+    			       BOARDTITLE, 
+    			       BOARDCONTENT, 
+    			       BOARDDATE, 
+    			       BOARDREADCOUNT,
+    			       USERNAME
+			FROM (SELECT * FROM BOARD
+	<if test="searchtext != null and selectoption.equals('BOARDTITLE')">
+		 	WHERE BOARDTITLE LIKE '%${searchtext}%'
+	</if> 
+	        ORDER BY BOARDNO DESC LIMIT 1000000
+	        )AS A 
+	        WHERE (@ROWNUM:=0)=0 
+	        ORDER BY RNUM ASC LIMIT 1000000
+	    )AS B 
+	    LIMIT #{startList}, #{endList}
+    </select>
+    
+     <select id="boardListCount" resultType="int" parameterType="CommonPage">
+       SELECT COUNT(*)
+       FROM BOARD 
+       <if test="searchtext != null and selectoption.equals('BOARDTITLE')">
+          WHERE BOARDTITLE LIKE '%${searchtext}%'
+       </if>
+    </select>
+    
+     <insert id="boardWrite" parameterType="Board">
+         INSERT INTO BOARD VALUES (NEXT VALUE FOR BNO,
+         						 #{BOARDTITLE}, 
+         						 #{BOARDCONTENT},
+         						 SYSDATE() , 
+         						 #{BOARDREADCOUNT},
+         						 #{USERNAME},
+         						 #{BOARDORIGINALFILE}, 
+         						 #{BOARDRENAMEFILE}, 
+         						 #{USERNO})
+     </insert>
+     
+     
+     <!-- 게시판 상세보기 -->
+      <select id="boardDetail" resultType="Board" parameterType="int">
+          SELECT * FROM board WHERE BOARDNO = #{boardno}
+ 	</select>
+ 	
+      
+      
+      
+  </mapper>
